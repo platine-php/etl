@@ -1,0 +1,67 @@
+{
+    "name": "platine-php/etl",
+    "description": "Platine ETL is a library to Extract-Transform-Load Data from various sources",
+    "type": "library",
+    "license": "MIT",
+    "keywords": ["application", "etl", "framework", "php", "platine", "transform", "load", "extract", "import", "export"],
+    "authors": [
+        {
+            "name": "NGUEREZA Tony",
+            "email": "dev@platine-php.com",
+            "homepage": "https://www.platine-php.com",
+            "role": "developer"
+        }
+    ],
+
+    "support": {
+        "issues": "https://github.com/platine-php/etl/issues",
+        "source": "https://github.com/platine-php/etl"
+    },
+	
+    "require": {
+        "php": "^7.4 || ^8"
+    },
+	
+    "require-dev": {
+        "mikey179/vfsstream": "~1.6",
+        "phpmd/phpmd": "@stable",
+        "phpstan/phpstan": "^1.8",
+        "phpunit/phpunit": "^9.5",
+        "platine-php/dev": "1.0.x-dev",
+        "squizlabs/php_codesniffer": "3.*"
+    },
+    
+    "autoload": {
+        "psr-4":{
+            "Platine\\Etl\\": "src/"
+        }
+    },
+    
+    "autoload-dev": {
+        "psr-4":{
+            "Platine\\Etl\\Test\\": "tests"
+        },
+        "files": ["tests/fixtures/mocks.php"]
+    },
+    
+    "config": {
+        "sort-packages": true
+    },
+    
+    "extra": {
+        "branch-alias": {
+            "dev-develop": "1.0.x-dev"
+        }
+    },
+
+    "scripts": {
+        "test": "phpunit --colors=always",
+        "static": "phpstan analyze",
+        "check": "phpcs",
+        "check-fix": "phpcbf",
+        "analyze": "phpmd src xml phpmd.xml"
+    },
+	
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
