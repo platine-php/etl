@@ -68,8 +68,6 @@ class JsonFileLoaderTest extends PlatineTestCase
         $this->expectException(RuntimeException::class);
         $o->load($generator->getIterator(), 'a', $etl);
         $o->commit(false);
-
-        $this->assertEquals('[{"a":"1","b":"2"}]', $file->getContent());
     }
 
     public function testEmptyMethod(): void
