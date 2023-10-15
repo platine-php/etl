@@ -34,9 +34,13 @@ declare(strict_types=1);
 namespace Platine\Etl;
 
 use InvalidArgumentException;
+use Platine\Etl\Event\BaseEvent;
 use Platine\Etl\Extractor\ExtractorInterface;
 use Platine\Etl\Loader\LoaderInterface;
 use Platine\Etl\Transformer\TransformerInterface;
+use Platine\Event\Dispatcher;
+use Platine\Event\DispatcherInterface;
+use Platine\Event\ListenerInterface;
 use RuntimeException;
 
 /**
@@ -85,15 +89,23 @@ class EtlTool
     protected ?int $flushCount = null;
 
     /**
+     * The event dispatcher
+     * @var DispatcherInterface
+     */
+    protected DispatcherInterface $dispatcher;
+
+    /**
      * Create new instance
      * @param ExtractorInterface|callable|null $extractor
      * @param TransformerInterface|callable|null $transformer
      * @param LoaderInterface|callable|null $loader
+     * @param DispatcherInterface|null $dispatcher
      */
     public function __construct(
         $extractor = null,
         $transformer = null,
-        $loader = null
+        $loader = null,
+        ?DispatcherInterface $dispatcher = null
     ) {
         if ($extractor !== null) {
             $this->extractor($extractor);
@@ -105,6 +117,8 @@ class EtlTool
         if ($loader !== null) {
             $this->loader($loader);
         }
+
+        $this->dispatcher = $dispatcher ?? new Dispatcher();
     }
 
     /**
@@ -200,7 +214,189 @@ class EtlTool
     }
 
     /**
-     * Create Etl instance
+     * Register a listener for start event
+     *
+     * @param ListenerInterface|callable $listener the Listener interface or any callable
+     * @param int $priority the listener execution priority
+     * @return $this
+     */
+    public function onStart($listener, int $priority = DispatcherInterface::PRIORITY_DEFAULT): self
+    {
+        $this->dispatcher->addListener(BaseEvent::START, $listener, $priority);
+
+        return $this;
+    }
+
+    /**
+     * Register a listener for extract event
+     *
+     * @param ListenerInterface|callable $listener the Listener interface or any callable
+     * @param int $priority the listener execution priority
+     * @return $this
+     */
+    public function onExtract($listener, int $priority = DispatcherInterface::PRIORITY_DEFAULT): self
+    {
+        $this->dispatcher->addListener(BaseEvent::EXTRACT, $listener, $priority);
+
+        return $this;
+    }
+
+    /**
+     * Register a listener for extract exception event
+     *
+     * @param ListenerInterface|callable $listener the Listener interface or any callable
+     * @param int $priority the listener execution priority
+     * @return $this
+     */
+    public function onExtractException($listener, int $priority = DispatcherInterface::PRIORITY_DEFAULT): self
+    {
+        $this->dispatcher->addListener(BaseEvent::EXTRACT_EXCEPTION, $listener, $priority);
+
+        return $this;
+    }
+
+    /**
+     * Register a listener for transform event
+     *
+     * @param ListenerInterface|callable $listener the Listener interface or any callable
+     * @param int $priority the listener execution priority
+     * @return $this
+     */
+    public function onTransform($listener, int $priority = DispatcherInterface::PRIORITY_DEFAULT): self
+    {
+        $this->dispatcher->addListener(BaseEvent::TRANSFORM, $listener, $priority);
+
+        return $this;
+    }
+
+    /**
+     * Register a listener for transform exception event
+     *
+     * @param ListenerInterface|callable $listener the Listener interface or any callable
+     * @param int $priority the listener execution priority
+     * @return $this
+     */
+    public function onTransformException($listener, int $priority = DispatcherInterface::PRIORITY_DEFAULT): self
+    {
+        $this->dispatcher->addListener(BaseEvent::TRANSFORM_EXCEPTION, $listener, $priority);
+
+        return $this;
+    }
+
+    /**
+     * Register a listener for loader init event
+     *
+     * @param ListenerInterface|callable $listener the Listener interface or any callable
+     * @param int $priority the listener execution priority
+     * @return $this
+     */
+    public function onLoaderInit($listener, int $priority = DispatcherInterface::PRIORITY_DEFAULT): self
+    {
+        $this->dispatcher->addListener(BaseEvent::LOADER_INIT, $listener, $priority);
+
+        return $this;
+    }
+
+    /**
+     * Register a listener for loader load event
+     *
+     * @param ListenerInterface|callable $listener the Listener interface or any callable
+     * @param int $priority the listener execution priority
+     * @return $this
+     */
+    public function onLoad($listener, int $priority = DispatcherInterface::PRIORITY_DEFAULT): self
+    {
+        $this->dispatcher->addListener(BaseEvent::LOAD, $listener, $priority);
+
+        return $this;
+    }
+
+    /**
+     * Register a listener for loader load exception event
+     *
+     * @param ListenerInterface|callable $listener the Listener interface or any callable
+     * @param int $priority the listener execution priority
+     * @return $this
+     */
+    public function onLoadException($listener, int $priority = DispatcherInterface::PRIORITY_DEFAULT): self
+    {
+        $this->dispatcher->addListener(BaseEvent::LOAD_EXCEPTION, $listener, $priority);
+
+        return $this;
+    }
+
+    /**
+     * Register a listener for flush event
+     *
+     * @param ListenerInterface|callable $listener the Listener interface or any callable
+     * @param int $priority the listener execution priority
+     * @return $this
+     */
+    public function onFlush($listener, int $priority = DispatcherInterface::PRIORITY_DEFAULT): self
+    {
+        $this->dispatcher->addListener(BaseEvent::FLUSH, $listener, $priority);
+
+        return $this;
+    }
+
+    /**
+     * Register a listener for skip event
+     *
+     * @param ListenerInterface|callable $listener the Listener interface or any callable
+     * @param int $priority the listener execution priority
+     * @return $this
+     */
+    public function onSkip($listener, int $priority = DispatcherInterface::PRIORITY_DEFAULT): self
+    {
+        $this->dispatcher->addListener(BaseEvent::SKIP, $listener, $priority);
+
+        return $this;
+    }
+
+    /**
+     * Register a listener for stop event
+     *
+     * @param ListenerInterface|callable $listener the Listener interface or any callable
+     * @param int $priority the listener execution priority
+     * @return $this
+     */
+    public function onStop($listener, int $priority = DispatcherInterface::PRIORITY_DEFAULT): self
+    {
+        $this->dispatcher->addListener(BaseEvent::STOP, $listener, $priority);
+
+        return $this;
+    }
+
+    /**
+     * Register a listener for rollback event
+     *
+     * @param ListenerInterface|callable $listener the Listener interface or any callable
+     * @param int $priority the listener execution priority
+     * @return $this
+     */
+    public function onRollback($listener, int $priority = DispatcherInterface::PRIORITY_DEFAULT): self
+    {
+        $this->dispatcher->addListener(BaseEvent::ROLLBACK, $listener, $priority);
+
+        return $this;
+    }
+
+    /**
+     * Register a listener for end event
+     *
+     * @param ListenerInterface|callable $listener the Listener interface or any callable
+     * @param int $priority the listener execution priority
+     * @return $this
+     */
+    public function onEnd($listener, int $priority = DispatcherInterface::PRIORITY_DEFAULT): self
+    {
+        $this->dispatcher->addListener(BaseEvent::END, $listener, $priority);
+
+        return $this;
+    }
+
+    /**
+     * Create ETL object
      * @return Etl
      */
     public function create(): Etl
@@ -220,7 +416,8 @@ class EtlTool
             $this->loader,
             $this->committer,
             $this->restorer,
-            $this->flushCount
+            $this->flushCount,
+            $this->dispatcher
         );
     }
 }

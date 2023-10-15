@@ -86,7 +86,7 @@ class EtlTest extends PlatineTestCase
         $tool->extractor(fn($input, Etl $etl) => ['a', 'b', 'c']);
         $tool->transformer(function ($value, $key, Etl $etl) {
             if ($value === 'b') {
-                $etl->stop(true);
+                $etl->stopProcess(true);
             }
             yield $value;
         });
@@ -109,7 +109,7 @@ class EtlTest extends PlatineTestCase
         $tool = new EtlTool();
         $tool->extractor(function ($input, Etl $etl) {
             $etl->triggerFlush();
-            $etl->stop(true);
+            $etl->stopProcess(true);
             return null;
         });
         $tool->loader(new NullLoader());
@@ -159,15 +159,14 @@ class EtlTest extends PlatineTestCase
 
         $tool = new EtlTool();
         $tool->extractor(function ($input, Etl $etl) {
-            $etl->triggerFlush();
             return ['a', 'b', 'c'];
         });
         $tool->loader(function (Generator $item, $key, Etl $etl) use (&$target) {
             throw new EtlException();
         });
 
-        $this->expectException(EtlException::class);
         $o = $tool->create();
         $o->process();
+        $this->assertEquals(0, count($target));
     }
 }

@@ -34,9 +34,19 @@ declare(strict_types=1);
 namespace Platine\Etl;
 
 use EmptyIterator;
+use Exception;
 use Generator;
+use Platine\Etl\Event\BaseEvent;
+use Platine\Etl\Event\EndEvent;
+use Platine\Etl\Event\FlushEvent;
+use Platine\Etl\Event\ItemEvent;
+use Platine\Etl\Event\ItemExceptionEvent;
+use Platine\Etl\Event\RollbackEvent;
+use Platine\Etl\Event\StartEvent;
 use Platine\Etl\Exception\EtlException;
 use Platine\Etl\Loader\NullLoader;
+use Platine\Event\Dispatcher;
+use Platine\Event\DispatcherInterface;
 use Throwable;
 
 /**
@@ -109,6 +119,12 @@ class Etl
     protected bool $isRollback = false;
 
     /**
+     * The event dispatcher
+     * @var DispatcherInterface
+     */
+    protected DispatcherInterface $dispatcher;
+
+    /**
      * Create new instance
      * @param callable|null $extract
      * @param callable|null $transform
@@ -117,6 +133,7 @@ class Etl
      * @param callable|null $flush
      * @param callable|null $rollback
      * @param int|null $flushCount
+     * @param DispatcherInterface|null $dispatcher
      */
     public function __construct(
         ?callable $extract = null,
@@ -125,7 +142,8 @@ class Etl
         ?callable $load = null,
         ?callable $flush = null,
         ?callable $rollback = null,
-        ?int $flushCount = null
+        ?int $flushCount = null,
+        ?DispatcherInterface $dispatcher = null
     ) {
         $this->extract = $extract;
         $this->transform = $transform ?? $this->defaultTransformer();
@@ -138,6 +156,7 @@ class Etl
         $this->flush = $flush;
         $this->rollback = $rollback;
         $this->flushCount = $flushCount !== null ? max(1, $flushCount) : null;
+        $this->dispatcher = $dispatcher ?? new Dispatcher();
     }
 
     /**
@@ -191,7 +210,7 @@ class Etl
      * @param bool $isRollback if the loader should rollback instead of flushing.
      * @return void
      */
-    public function stop(bool $isRollback = false): void
+    public function stopProcess(bool $isRollback = false): void
     {
         $this->isStop = true;
         $this->isRollback = $isRollback;
@@ -224,6 +243,17 @@ class Etl
     protected function skip($item, $key): void
     {
         $this->isSkip = false;
+        $this->dispatcher->dispatch(new ItemEvent(BaseEvent::SKIP, $item, $key, $this));
+    }
+
+    /**
+     * @param mixed $item
+     * @param int|string $key
+     * @return void
+     */
+    protected function stop($item, $key): void
+    {
+        $this->dispatcher->dispatch(new ItemEvent(BaseEvent::STOP, $item, $key, $this));
     }
 
     /**
@@ -233,6 +263,7 @@ class Etl
     protected function start(): void
     {
         $this->reset();
+        $this->dispatcher->dispatch(new StartEvent($this));
     }
 
     /**
@@ -263,9 +294,27 @@ class Etl
             throw new EtlException('Could not extract data');
         }
 
-        foreach ($items as $key => $item) {
-            $this->isSkip = false;
-            yield $key => $item;
+        try {
+            foreach ($items as $key => $item) {
+                try {
+                    $this->isSkip = false;
+                    $this->dispatcher->dispatch(new ItemEvent(BaseEvent::EXTRACT, $item, $key, $this));
+                    yield $key => $item;
+                } catch (Exception $e) {
+                    continue;
+                }
+            }
+        } catch (Throwable $e) {
+            /** @var ItemExceptionEvent $event */
+            $event = null;
+            $this->dispatcher->dispatch(
+                new ItemExceptionEvent(BaseEvent::EXTRACT_EXCEPTION, $item ?? null, $key ?? null, $this, $e),
+                $event
+            );
+
+            if ($event instanceof ItemExceptionEvent && $event->shouldThrowException()) {
+                throw $e;
+            }
         }
     }
 
@@ -283,8 +332,22 @@ class Etl
         }
 
         $output = [];
-        foreach ($tranformed as $key => $value) {
-            $output[] = [$key, $value];
+        try {
+            foreach ($tranformed as $key => $value) {
+                $output[] = [$key, $value];
+            }
+            $this->dispatcher->dispatch(new ItemEvent(BaseEvent::TRANSFORM, $item, $key, $this));
+        } catch (Exception $e) {
+           /** @var ItemExceptionEvent $event */
+            $event = null;
+            $this->dispatcher->dispatch(
+                new ItemExceptionEvent(BaseEvent::TRANSFORM_EXCEPTION, $item ?? null, $key ?? null, $this, $e),
+                $event
+            );
+
+            if ($event instanceof ItemExceptionEvent && $event->shouldThrowException()) {
+                throw $e;
+            }
         }
 
         return static function () use ($output) {
@@ -302,6 +365,7 @@ class Etl
      */
     protected function initLoader($item, $key): void
     {
+        $this->dispatcher->dispatch(new ItemEvent(BaseEvent::LOADER_INIT, $item, $key, $this));
         if ($this->init === null) {
             return;
         }
@@ -328,11 +392,21 @@ class Etl
     ): void {
         try {
             ($this->load)($data, $key, $this);
-        } catch (Throwable $ex) {
+            $this->dispatcher->dispatch(new ItemEvent(BaseEvent::LOAD, $item, $key, $this));
+        } catch (Throwable $e) {
+            /** @var ItemExceptionEvent $event */
+            $event = null;
+            $this->dispatcher->dispatch(
+                new ItemExceptionEvent(BaseEvent::LOAD_EXCEPTION, $item ?? null, $key, $this, $e),
+                $event
+            );
+
+            if ($event instanceof ItemExceptionEvent && $event->shouldThrowException()) {
+                throw $e;
+            }
+
             $flushCounter--;
             $totalCounter--;
-            // Something to do with Exception ?
-            throw $ex;
         }
 
         $needFlush = $this->isFlush || $flush;
@@ -353,6 +427,7 @@ class Etl
             return;
         }
         ($this->flush)($partial);
+        $this->dispatcher->dispatch(new FlushEvent($this, $flushCounter, $partial));
         $flushCounter = 0;
         $this->isFlush = false;
     }
@@ -368,6 +443,7 @@ class Etl
             return;
         }
         ($this->rollback)();
+        $this->dispatcher->dispatch(new RollbackEvent($this, $flushCounter));
         $flushCounter = 0;
     }
 
@@ -385,7 +461,7 @@ class Etl
         } else {
             $this->flush($flushCounter, false);
         }
-
+        $this->dispatcher->dispatch(new EndEvent($this, (int) $totalCounter));
         $this->reset();
     }
 
