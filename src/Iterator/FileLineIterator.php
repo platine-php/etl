@@ -72,7 +72,7 @@ class FileLineIterator implements IteratorAggregate
     /**
      * Create file object from filename
      * @param string $filename
-     * @return $this
+     * @return self
      */
     public static function createFromFilename(string $filename): self
     {

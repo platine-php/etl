@@ -77,7 +77,7 @@ class CsvFileLoader implements LoaderInterface
     /**
      * Create new instance
      * @param SplFileObject|string $file
-     * @param array $keys
+     * @param array<string> $keys
      * @param string $delimiter
      * @param string $enclosure
      * @param string $escapeString

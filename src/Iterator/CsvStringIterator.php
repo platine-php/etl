@@ -107,7 +107,7 @@ class CsvStringIterator implements IteratorAggregate, CsvIteratorInterface
      * @param string $delimiter
      * @param string $enclosure
      * @param string $escapeString
-     * @return $this
+     * @return self
      */
     public static function createFromText(
         string $text,

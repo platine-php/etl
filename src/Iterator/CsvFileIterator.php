@@ -82,7 +82,7 @@ class CsvFileIterator extends FilterIterator implements Countable, CsvIteratorIn
      * @param string $delimiter
      * @param string $enclosure
      * @param string $escapeString
-     * @return $this
+     * @return self
      */
     public static function createFromFilename(
         string $filename,
