@@ -11,6 +11,7 @@ use Platine\Etl\EtlTool;
 use Platine\Etl\Extractor\CsvExtractor;
 use Platine\Etl\Loader\NullLoader;
 use Platine\Etl\Transformer\CallableTransformer;
+use Platine\Event\Dispatcher;
 use RuntimeException;
 
 /**
@@ -103,4 +104,31 @@ class EtlToolTest extends PlatineTestCase
 
         $this->assertInstanceOf(Etl::class, $etl);
     }
+    
+    public function testEvents(): void
+    {
+        $dispatcher = $this->getMockInstance(Dispatcher::class);
+        
+        $dispatcher->expects($this->exactly(13))
+                ->method('addListener');
+        
+        
+        $o = new EtlTool(null, null, null, $dispatcher);
+        
+        $o->onStart(fn() => true);
+        $o->onExtract(fn() => true);
+        $o->onTransform(fn() => true);
+        $o->onExtractException(fn() => true);
+        $o->onTransformException(fn() => true);
+        $o->onLoaderInit(fn() => true);
+        $o->onLoad(fn() => true);
+        $o->onLoadException(fn() => true);
+        $o->onFlush(fn() => true);
+        $o->onSkip(fn() => true);
+        $o->onStop(fn() => true);
+        $o->onRollback(fn() => true);
+        $o->onEnd(fn() => true);
+    }
+    
+    
 }
