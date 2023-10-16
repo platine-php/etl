@@ -177,6 +177,7 @@ class Etl
             }
 
             if ($this->isStop) {
+                $this->stop($item, $key);
                 break;
             }
 
@@ -188,6 +189,7 @@ class Etl
             }
 
             if ($this->isStop) {
+                $this->stop($item, $key);
                 break;
             }
 
@@ -306,13 +308,11 @@ class Etl
             }
         } catch (Throwable $e) {
             /** @var ItemExceptionEvent $event */
-            $event = null;
-            $this->dispatcher->dispatch(
-                new ItemExceptionEvent(BaseEvent::EXTRACT_EXCEPTION, $item ?? null, $key ?? null, $this, $e),
-                $event
+            $event = $this->dispatcher->dispatch(
+                new ItemExceptionEvent(BaseEvent::EXTRACT_EXCEPTION, $item ?? null, $key ?? null, $this, $e)
             );
 
-            if ($event instanceof ItemExceptionEvent && $event->shouldThrowException()) {
+            if ($event->shouldThrowException()) {
                 throw $e;
             }
         }
@@ -339,13 +339,11 @@ class Etl
             $this->dispatcher->dispatch(new ItemEvent(BaseEvent::TRANSFORM, $item, $key, $this));
         } catch (Exception $e) {
            /** @var ItemExceptionEvent $event */
-            $event = null;
-            $this->dispatcher->dispatch(
-                new ItemExceptionEvent(BaseEvent::TRANSFORM_EXCEPTION, $item ?? null, $key ?? null, $this, $e),
-                $event
+            $event = $this->dispatcher->dispatch(
+                new ItemExceptionEvent(BaseEvent::TRANSFORM_EXCEPTION, $item ?? null, $key ?? null, $this, $e)
             );
 
-            if ($event instanceof ItemExceptionEvent && $event->shouldThrowException()) {
+            if ($event->shouldThrowException()) {
                 throw $e;
             }
         }
@@ -395,13 +393,11 @@ class Etl
             $this->dispatcher->dispatch(new ItemEvent(BaseEvent::LOAD, $item, $key, $this));
         } catch (Throwable $e) {
             /** @var ItemExceptionEvent $event */
-            $event = null;
-            $this->dispatcher->dispatch(
-                new ItemExceptionEvent(BaseEvent::LOAD_EXCEPTION, $item ?? null, $key, $this, $e),
-                $event
+            $event = $this->dispatcher->dispatch(
+                new ItemExceptionEvent(BaseEvent::LOAD_EXCEPTION, $item ?? null, $key, $this, $e)
             );
 
-            if ($event instanceof ItemExceptionEvent && $event->shouldThrowException()) {
+            if ($event->shouldThrowException()) {
                 throw $e;
             }
 

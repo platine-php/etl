@@ -104,17 +104,17 @@ class EtlToolTest extends PlatineTestCase
 
         $this->assertInstanceOf(Etl::class, $etl);
     }
-    
+
     public function testEvents(): void
     {
         $dispatcher = $this->getMockInstance(Dispatcher::class);
-        
+
         $dispatcher->expects($this->exactly(13))
                 ->method('addListener');
-        
-        
+
+
         $o = new EtlTool(null, null, null, $dispatcher);
-        
+
         $o->onStart(fn() => true);
         $o->onExtract(fn() => true);
         $o->onTransform(fn() => true);
@@ -129,6 +129,4 @@ class EtlToolTest extends PlatineTestCase
         $o->onRollback(fn() => true);
         $o->onEnd(fn() => true);
     }
-    
-    
 }
