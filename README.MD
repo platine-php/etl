@@ -8,8 +8,8 @@
 [![License](https://poser.pugx.org/platine-php/etl/license)](https://packagist.org/packages/platine-php/etl)  
 ![Build Status](https://github.com/platine-php/etl/actions/workflows/ci.yml/badge.svg)
 [![Quality Score](https://img.shields.io/scrutinizer/g/platine-php/etl.svg?style=flat-square)](https://scrutinizer-ci.com/g/platine-php/etl)
-[![Maintainability](https://app.codacy.com/project/badge/Grade/017929cb6ee34bb69f7742e5245bdc95)](https://app.codacy.com/gh/platine-php/etl/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
-[![Test Coverage](https://app.codacy.com/project/badge/Coverage/017929cb6ee34bb69f7742e5245bdc95)](https://app.codacy.com/gh/platine-php/etl/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_coverage)
+[![Maintainability](https://app.codacy.com/project/badge/Grade/cae13f86ab3341478bda3e123cf856b2)](https://app.codacy.com/gh/platine-php/etl/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
+[![Test Coverage](https://app.codacy.com/project/badge/Coverage/cae13f86ab3341478bda3e123cf856b2)](https://app.codacy.com/gh/platine-php/etl/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_coverage)
 
 ### Requirements 
 - **PHP >= 7.4**, **PHP 8** 
