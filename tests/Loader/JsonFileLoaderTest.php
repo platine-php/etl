@@ -7,6 +7,7 @@ namespace Platine\Etl\Test\Loader;
 use org\bovigo\vfs\vfsStream;
 use Platine\Dev\PlatineTestCase;
 use Platine\Etl\Etl;
+use Platine\Etl\Fixture\MySplFileObject;
 use Platine\Etl\Iterator\CsvKeysAwareIterator;
 use Platine\Etl\Iterator\CsvStringIterator;
 use Platine\Etl\Iterator\TextLineIterator;
@@ -53,9 +54,6 @@ class JsonFileLoaderTest extends PlatineTestCase
 
     public function testLoadException(): void
     {
-        global $mock_json_encode;
-
-        $mock_json_encode = true;
         $textIterator = new TextLineIterator("a,b\n\r1,2");
         $iterator = new CsvStringIterator($textIterator);
 
@@ -63,7 +61,7 @@ class JsonFileLoaderTest extends PlatineTestCase
 
         $etl = $this->getMockInstance(Etl::class);
         $file = $this->createVfsFile('data.csv', $this->vfsPath);
-        $o = new JsonFileLoader(new SplFileObject($file->url(), 'w'));
+        $o = new JsonFileLoader(new MySplFileObject($file->url(), 'w'));
 
         $this->expectException(RuntimeException::class);
         $o->load($generator->getIterator(), 'a', $etl);

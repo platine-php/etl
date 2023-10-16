@@ -35,6 +35,7 @@ namespace Platine\Etl\Loader;
 
 use Generator;
 use Platine\Etl\Etl;
+use Platine\Stdlib\Helper\Json;
 use RuntimeException;
 use SplFileObject;
 
@@ -116,7 +117,7 @@ class JsonFileLoader implements LoaderInterface
             return;
         }
 
-        if ($this->file->fwrite(json_encode($this->data, $this->options, $this->depth)) === 0) {
+        if ($this->file->fwrite(Json::encode($this->data, $this->options, $this->depth)) === 0) {
             throw new RuntimeException(sprintf(
                 'Unable to write json data into %s',
                 $this->file->getPathname()
