@@ -68,8 +68,11 @@ class ArrayLoader implements LoaderInterface
     /**
      * {@inheritodc}
      */
-    public function init(): void
+    public function init(array $options = []): void
     {
+        if (isset($options['preserve_keys']) && is_bool($options['preserve_keys'])) {
+            $this->preserveKeys = $options['preserve_keys'];
+        }
     }
 
 

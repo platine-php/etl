@@ -51,6 +51,19 @@ class JsonExtractorTest extends PlatineTestCase
         $this->assertEquals(['a' => 'b'], $o->extract($file->url(), $etl));
     }
 
+    public function testExtractFromFileUsingOptions(): void
+    {
+        $file = $this->createVfsFile('data.csv', $this->vfsPath, '{"a":"b"}');
+
+        $etl = $this->getMockInstance(Etl::class);
+
+        $o = new JsonExtractor(JsonExtractor::EXTRACT_FROM_ARRAY);
+
+        $this->assertEquals(['a' => 'b'], $o->extract($file->url(), $etl, [
+            'type' => JsonExtractor::EXTRACT_FROM_FILE
+        ]));
+    }
+
     public function testExtractFromFileSplFileObject(): void
     {
         $file = $this->createVfsFile('data.csv', $this->vfsPath, '{"a":"b"}');

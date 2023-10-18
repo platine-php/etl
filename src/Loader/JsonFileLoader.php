@@ -92,9 +92,16 @@ class JsonFileLoader implements LoaderInterface
     /**
      * {@inheritodc}
      */
-    public function init(): void
+    public function init(array $options = []): void
     {
         $this->data = [];
+        if (isset($options['options']) && is_int($options['options'])) {
+            $this->options = $options['options'];
+        }
+
+        if (isset($options['depth']) && is_int($options['depth'])) {
+            $this->depth = $options['depth'];
+        }
     }
 
 

@@ -70,8 +70,10 @@ class JsonExtractor implements ExtractorInterface
     /**
      * {@inheritodc}
      */
-    public function extract($input, Etl $etl): iterable
+    public function extract($input, Etl $etl, array $options = []): iterable
     {
+        $this->setOptions($options);
+
         switch ($this->type) {
             case self::EXTRACT_FROM_ARRAY:
                 return $this->extractFromArray($input);
@@ -157,5 +159,19 @@ class JsonExtractor implements ExtractorInterface
 
             throw $e;
         }
+    }
+
+    /**
+     * Set the options
+     * @param array<string, mixed> $options
+     * @return $this
+     */
+    protected function setOptions(array $options)
+    {
+        if (isset($options['type']) && is_int($options['type'])) {
+            $this->type = $options['type'];
+        }
+
+        return $this;
     }
 }

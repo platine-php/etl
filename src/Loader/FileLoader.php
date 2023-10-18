@@ -72,8 +72,11 @@ class FileLoader implements LoaderInterface
         /**
      * {@inheritodc}
      */
-    public function init(): void
+    public function init(array $options = []): void
     {
+        if (isset($options['eol'])) {
+            $this->eol = $options['eol'];
+        }
     }
 
 

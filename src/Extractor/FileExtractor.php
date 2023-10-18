@@ -61,7 +61,7 @@ class FileExtractor implements ExtractorInterface
      * {@inheritodc}
      * @param string $input
      */
-    public function extract($input, Etl $etl): iterable
+    public function extract($input, Etl $etl, array $options = []): iterable
     {
         return $this->contentExtractor->extract((string) file_get_contents($input), $etl);
     }

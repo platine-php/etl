@@ -105,8 +105,10 @@ class CsvExtractor implements ExtractorInterface
     /**
      * {@inheritodc}
      */
-    public function extract($input, Etl $etl): iterable
+    public function extract($input, Etl $etl, array $options = []): iterable
     {
+        $this->setOptions($options);
+
         switch ($this->type) {
             case self::EXTRACT_FROM_FILE:
                 $iterator = $this->extractFromFile($input);
@@ -183,5 +185,31 @@ class CsvExtractor implements ExtractorInterface
         }
 
         return $this->extractFromString($data);
+    }
+
+    /**
+     * Set the options
+     * @param array<string, mixed> $options
+     * @return $this
+     */
+    protected function setOptions(array $options)
+    {
+        if (isset($options['delimiter'])) {
+            $this->delimiter = $options['delimiter'];
+        }
+
+        if (isset($options['enclosure'])) {
+            $this->enclosure = $options['enclosure'];
+        }
+
+        if (isset($options['escape_string'])) {
+            $this->escapeString = $options['escape_string'];
+        }
+
+        if (isset($options['create_keys']) && is_bool($options['create_keys'])) {
+            $this->createKeys = $options['create_keys'];
+        }
+
+        return $this;
     }
 }

@@ -79,9 +79,29 @@ class CsvExtractorTest extends PlatineTestCase
         $res = $o->extract("a,b\n1,2", $etl);
 
         $this->assertInstanceOf(CsvStringIterator::class, $res);
-        $res = $res->getIterator();
-        $this->assertTrue($res->valid());
-        $this->assertEquals(['a', 'b'], $res->current());
+        $data = $res->getIterator();
+        $this->assertTrue($data->valid());
+        $this->assertEquals(['a', 'b'], $data->current());
+    }
+
+    public function testExtractFromStringUsingOptions(): void
+    {
+        $etl = $this->getMockInstance(Etl::class);
+
+        $o = new CsvExtractor(CsvExtractor::EXTRACT_FROM_STRING);
+
+        /** @var CsvStringIterator $res */
+        $res = $o->extract("a,b\n1,2", $etl, [
+            'delimiter' => ',',
+            'enclosure' => '"',
+            'escape_string' => '\\',
+            'create_keys' => false,
+        ]);
+
+        $this->assertInstanceOf(CsvStringIterator::class, $res);
+        $data = $res->getIterator();
+        $this->assertTrue($data->valid());
+        $this->assertEquals(['a', 'b'], $data->current());
     }
 
     public function testExtractAutoString(): void
@@ -94,9 +114,9 @@ class CsvExtractorTest extends PlatineTestCase
         $res = $o->extract("a,b\n1,2", $etl);
 
         $this->assertInstanceOf(CsvStringIterator::class, $res);
-        $res = $res->getIterator();
-        $this->assertTrue($res->valid());
-        $this->assertEquals(['a', 'b'], $res->current());
+        $data = $res->getIterator();
+        $this->assertTrue($data->valid());
+        $this->assertEquals(['a', 'b'], $data->current());
     }
 
     public function testExtractAutoFile(): void

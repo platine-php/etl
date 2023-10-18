@@ -56,6 +56,30 @@ class EtlTest extends PlatineTestCase
         $this->assertEquals(['a','b'], $target->current());
     }
 
+    public function testProcessUsingOptions(): void
+    {
+        $target = [];
+
+        $tool = new EtlTool();
+        $tool->extractor(fn($input, Etl $etl) => ['a', 'b']);
+        $tool->transformer(fn() => yield ['a', 'b']);
+        $tool->loader(function ($item, $key, Etl $etl) use (&$target) {
+            $target = $item;
+        });
+
+        $o = $tool->create();
+        $this->assertCount(0, $o->getOptions());
+        $o->process('a,b', ['foo' => 123]);
+        $this->assertEquals(['a','b'], $target->current());
+        $this->assertCount(1, $o->getOptions());
+        $this->assertArrayHasKey('foo', $o->getOptions());
+        $this->assertEquals(123, $o->getOptions()['foo']);
+        $o->setOptions(['foo' => 122]);
+        $this->assertCount(1, $o->getOptions());
+        $this->assertArrayHasKey('foo', $o->getOptions());
+        $this->assertEquals(122, $o->getOptions()['foo']);
+    }
+
     public function testProcessNullLoader(): void
     {
         $target = [];

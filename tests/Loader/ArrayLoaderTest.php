@@ -39,6 +39,22 @@ class ArrayLoaderTest extends PlatineTestCase
         $this->assertEquals('bar', $o->getData()['a']);
     }
 
+    public function testLoadPreseverKeysUsingOptions(): void
+    {
+        $generator = new TextLineIterator("foo\n\rbar", true);
+        $etl = $this->getMockInstance(Etl::class);
+        $data = [];
+        $o = new ArrayLoader(false, $data);
+
+        $o->init(['preserve_keys' => true]);
+
+        $o->load($generator->getIterator(), 'a', $etl);
+
+        $this->assertCount(1, $o->getData());
+        $this->assertArrayHasKey('a', $o->getData());
+        $this->assertEquals('bar', $o->getData()['a']);
+    }
+
     public function testLoadIgnorePreseverKeys(): void
     {
         $generator = new TextLineIterator("foo\n\rbar", true);

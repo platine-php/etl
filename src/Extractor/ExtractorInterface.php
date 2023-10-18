@@ -48,7 +48,8 @@ interface ExtractorInterface
      * Extract the source data
      * @param mixed $input
      * @param Etl $etl
+     * @param array<string, mixed> $options additional options
      * @return iterable<int|string, mixed>
      */
-    public function extract($input, Etl $etl): iterable;
+    public function extract($input, Etl $etl, array $options = []): iterable;
 }

@@ -125,6 +125,12 @@ class Etl
     protected DispatcherInterface $dispatcher;
 
     /**
+     * Additional options
+     * @var array<string, mixed>
+     */
+    protected array $options = [];
+
+    /**
      * Create new instance
      * @param callable|null $extract
      * @param callable|null $transform
@@ -160,12 +166,38 @@ class Etl
     }
 
     /**
+     * Return the additional options
+     * @return array<string, mixed>
+     */
+    public function getOptions(): array
+    {
+        return $this->options;
+    }
+
+    /**
+     * Set the additional options
+     * @param array<string, mixed> $options
+     * @return $this
+     */
+    public function setOptions(array $options): self
+    {
+        $this->options = $options;
+        return $this;
+    }
+
+
+    /**
      * Run the ETL on the given input.
      * @param mixed|null $data
+     * @param array<string, mixed> $options additional options
      * @return void
      */
-    public function process($data = null): void
+    public function process($data = null, array $options = []): void
     {
+        if (count($options) > 0) {
+            $this->options = $options;
+        }
+
         $flushCounter = 0;
         $totalCounter = 0;
 
@@ -287,7 +319,7 @@ class Etl
      */
     protected function extract($data): iterable
     {
-        $items = $this->extract === null ? $data : ($this->extract)($data, $this);
+        $items = $this->extract === null ? $data : ($this->extract)($data, $this, $this->options);
         if ($items === null) {
             $items = new EmptyIterator();
         }
@@ -326,7 +358,7 @@ class Etl
      */
     protected function transform($item, $key): callable
     {
-        $tranformed = ($this->transform)($item, $key, $this);
+        $tranformed = ($this->transform)($item, $key, $this, $this->options);
         if (!$tranformed instanceof Generator) {
             throw new EtlException('The transformer must return a generator');
         }
@@ -367,7 +399,7 @@ class Etl
         if ($this->init === null) {
             return;
         }
-        ($this->init)();
+        ($this->init)($this->options);
     }
 
     /**

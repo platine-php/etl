@@ -52,6 +52,27 @@ class JsonFileLoaderTest extends PlatineTestCase
         $this->assertEquals('[{"a":"1","b":"2"}]', $file->getContent());
     }
 
+    public function testLoadUsingOptions(): void
+    {
+        $textIterator = new TextLineIterator("a,b\n\r1,2");
+        $iterator = new CsvStringIterator($textIterator);
+
+        $generator = new CsvKeysAwareIterator($iterator, ['a', 'b'], true);
+
+        $etl = $this->getMockInstance(Etl::class);
+
+        $file = $this->createVfsFile('data.csv', $this->vfsPath);
+        $o = new JsonFileLoader(new SplFileObject($file->url(), 'w'));
+        $o->init([
+            'options' => JSON_BIGINT_AS_STRING,
+            'depth' => 100,
+        ]);
+        $o->load($generator->getIterator(), 'a', $etl);
+        $o->commit(false);
+
+        $this->assertEquals('[{"a":"1","b":"2"}]', $file->getContent());
+    }
+
     public function testLoadException(): void
     {
         $textIterator = new TextLineIterator("a,b\n\r1,2");

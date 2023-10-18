@@ -104,8 +104,24 @@ class CsvFileLoader implements LoaderInterface
     /**
      * {@inheritodc}
      */
-    public function init(): void
+    public function init(array $options = []): void
     {
+        if (isset($options['delimiter'])) {
+            $this->delimiter = $options['delimiter'];
+        }
+
+        if (isset($options['enclosure'])) {
+            $this->enclosure = $options['enclosure'];
+        }
+
+        if (isset($options['escape_string'])) {
+            $this->escapeString = $options['escape_string'];
+        }
+
+        if (isset($options['keys']) && is_array($options['keys'])) {
+            $this->keys = $options['keys'];
+        }
+
         if (count($this->keys) > 0) {
             $this->file->fputcsv(
                 $this->keys,

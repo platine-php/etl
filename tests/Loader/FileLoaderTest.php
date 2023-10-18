@@ -43,7 +43,20 @@ class FileLoaderTest extends PlatineTestCase
         $this->assertEquals('foobar', $file->getContent());
     }
 
+    public function testLoadUsingOptions(): void
+    {
+        $generator = new TextLineIterator("foo\n\rbar", true);
+        $etl = $this->getMockInstance(Etl::class);
 
+        $file = $this->createVfsFile('data.csv', $this->vfsPath);
+        $o = new FileLoader(new SplFileObject($file->url(), 'w'), '');
+        $o->init([
+            'eol' => '|'
+        ]);
+        $o->load($generator->getIterator(), 'a', $etl);
+
+        $this->assertEquals('foo|bar|', $file->getContent());
+    }
 
     public function testEmptyMethod(): void
     {

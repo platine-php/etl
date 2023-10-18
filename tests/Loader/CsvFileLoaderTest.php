@@ -49,6 +49,28 @@ class CsvFileLoaderTest extends PlatineTestCase
         $this->assertEquals("a,b\n1,2\n", $file->getContent());
     }
 
+    public function testLoadUsingOptions(): void
+    {
+        $textIterator = new TextLineIterator("a,b\n\r1,2");
+        $iterator = new CsvStringIterator($textIterator);
+
+        $generator = new CsvKeysAwareIterator($iterator, ['a', 'b'], false);
+
+        $etl = $this->getMockInstance(Etl::class);
+
+        $file = $this->createVfsFile('data.csv', $this->vfsPath);
+        $o = new CsvFileLoader(new SplFileObject($file->url(), 'w'), ['a', 'b']);
+        $o->init([
+            'delimiter' => ';',
+            'enclosure' => '"',
+            'escape_string' => '\\',
+            'keys' => [],
+        ]);
+        $o->load($generator->getIterator(), 'a', $etl);
+
+        $this->assertEquals("a;b\n1;2\n", $file->getContent());
+    }
+
 
 
     public function testEmptyMethod(): void

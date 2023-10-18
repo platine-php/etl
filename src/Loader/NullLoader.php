@@ -45,7 +45,7 @@ class NullLoader implements LoaderInterface
     /**
      * {@inheritodc}
      */
-    public function init(): void
+    public function init(array $options = []): void
     {
     }
 

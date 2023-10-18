@@ -46,9 +46,10 @@ interface LoaderInterface
 {
     /**
      * Init loader (start a transaction, if supported) and reset loader state.
+     * @param array<string, mixed> $options additional options
      * @return void
      */
-    public function init(): void;
+    public function init(array $options = []): void;
 
 
     /**
