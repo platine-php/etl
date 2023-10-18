@@ -83,17 +83,17 @@ class CsvExtractor implements ExtractorInterface
     /**
      * Create new instance
      * @param int $type
+     * @param bool $createKeys
      * @param string $delimiter
      * @param string $enclosure
      * @param string $escapeString
-     * @param bool $createKeys
      */
     public function __construct(
         int $type = self::EXTRACT_AUTO,
+        bool $createKeys = false,
         string $delimiter = ',',
         string $enclosure = '"',
-        string $escapeString = '\\',
-        bool $createKeys = false
+        string $escapeString = '\\'
     ) {
         $this->delimiter = $delimiter;
         $this->enclosure = $enclosure;
