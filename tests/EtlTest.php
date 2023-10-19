@@ -61,17 +61,21 @@ class EtlTest extends PlatineTestCase
         $target = [];
 
         $tool = new EtlTool();
-        $tool->extractor(fn($input, Etl $etl) => ['a', 'b']);
-        $tool->transformer(fn() => yield ['a', 'b']);
+        $tool->extractor(fn($input, Etl $etl, array $options = []) => ['a', 'b', $options['e']]);
+        $tool->transformer(fn($value, $key, Etl $etl, array $options = []) => yield ['a', 'b', $options['t']]);
         $tool->loader(function ($item, $key, Etl $etl) use (&$target) {
             $target = $item;
         });
 
         $o = $tool->create();
         $this->assertCount(0, $o->getOptions());
-        $o->process('a,b', ['foo' => 123]);
-        $this->assertEquals(['a','b'], $target->current());
-        $this->assertCount(1, $o->getOptions());
+        $o->process('a,b', [
+            'foo' => 123,
+            'extract' => ['e' => 'c'],
+            'transform' => ['t' => 10],
+        ]);
+        $this->assertEquals(['a','b', 10], $target->current());
+        $this->assertCount(3, $o->getOptions());
         $this->assertArrayHasKey('foo', $o->getOptions());
         $this->assertEquals(123, $o->getOptions()['foo']);
         $o->setOptions(['foo' => 122]);
@@ -90,7 +94,9 @@ class EtlTest extends PlatineTestCase
         $tool->loader(new NullLoader());
 
         $o = $tool->create();
-        $o->process('a,b');
+        $o->process('a,b', [
+            'loader' => ['l' => 85],
+        ]);
         $this->assertCount(0, $target);
     }
 

@@ -319,7 +319,13 @@ class Etl
      */
     protected function extract($data): iterable
     {
-        $items = $this->extract === null ? $data : ($this->extract)($data, $this, $this->options['extract'] ?? []);
+        $options = $this->options;
+        if (isset($options['extract'])) {
+            $options = array_merge($options, $options['extract']);
+            unset($options['extract']);
+        }
+
+        $items = $this->extract === null ? $data : ($this->extract)($data, $this, $options);
         if ($items === null) {
             $items = new EmptyIterator();
         }
@@ -358,7 +364,13 @@ class Etl
      */
     protected function transform($item, $key): callable
     {
-        $tranformed = ($this->transform)($item, $key, $this, $this->options['transform'] ?? []);
+        $options = $this->options;
+        if (isset($options['transform'])) {
+            $options = array_merge($options, $options['transform']);
+            unset($options['transform']);
+        }
+
+        $tranformed = ($this->transform)($item, $key, $this, $options);
         if (!$tranformed instanceof Generator) {
             throw new EtlException('The transformer must return a generator');
         }
@@ -399,7 +411,14 @@ class Etl
         if ($this->init === null) {
             return;
         }
-        ($this->init)($this->options['loader'] ?? []);
+
+        $options = $this->options;
+        if (isset($options['loader'])) {
+            $options = array_merge($options, $options['loader']);
+            unset($options['loader']);
+        }
+
+        ($this->init)($options);
     }
 
     /**
