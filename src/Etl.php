@@ -319,7 +319,7 @@ class Etl
      */
     protected function extract($data): iterable
     {
-        $items = $this->extract === null ? $data : ($this->extract)($data, $this, $this->options);
+        $items = $this->extract === null ? $data : ($this->extract)($data, $this, $this->options['extract'] ?? []);
         if ($items === null) {
             $items = new EmptyIterator();
         }
@@ -358,7 +358,7 @@ class Etl
      */
     protected function transform($item, $key): callable
     {
-        $tranformed = ($this->transform)($item, $key, $this, $this->options);
+        $tranformed = ($this->transform)($item, $key, $this, $this->options['transform'] ?? []);
         if (!$tranformed instanceof Generator) {
             throw new EtlException('The transformer must return a generator');
         }
@@ -399,7 +399,7 @@ class Etl
         if ($this->init === null) {
             return;
         }
-        ($this->init)($this->options);
+        ($this->init)($this->options['loader'] ?? []);
     }
 
     /**
