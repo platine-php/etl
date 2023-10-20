@@ -71,8 +71,8 @@ class EtlTest extends PlatineTestCase
         $this->assertCount(0, $o->getOptions());
         $o->process('a,b', [
             'foo' => 123,
-            'extract' => ['e' => 'c'],
-            'transform' => ['t' => 10],
+            'e' => 'c',
+            't' => 10,
         ]);
         $this->assertEquals(['a','b', 10], $target->current());
         $this->assertCount(3, $o->getOptions());
