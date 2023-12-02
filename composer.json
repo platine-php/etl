@@ -50,12 +50,6 @@
         "sort-packages": true
     },
     
-    "extra": {
-        "branch-alias": {
-            "dev-develop": "1.0.x-dev"
-        }
-    },
-
     "scripts": {
         "test": "phpunit --colors=always",
         "static": "phpstan analyze",
@@ -64,6 +58,6 @@
         "analyze": "phpmd src xml phpmd.xml"
     },
 	
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "prefer-stable": true
 }
