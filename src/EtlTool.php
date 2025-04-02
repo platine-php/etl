@@ -102,9 +102,9 @@ class EtlTool
      * @param DispatcherInterface|null $dispatcher
      */
     public function __construct(
-        $extractor = null,
-        $transformer = null,
-        $loader = null,
+        ExtractorInterface|callable|null $extractor = null,
+        TransformerInterface|callable|null $transformer = null,
+        LoaderInterface|callable|null $loader = null,
         ?DispatcherInterface $dispatcher = null
     ) {
         if ($extractor !== null) {
@@ -126,7 +126,7 @@ class EtlTool
      * @param ExtractorInterface|callable|null $extractor
      * @return $this
      */
-    public function extractor($extractor): self
+    public function extractor(ExtractorInterface|callable|null $extractor): self
     {
         if ($extractor instanceof ExtractorInterface) {
             $this->extractor = [$extractor, 'extract'];
@@ -134,17 +134,10 @@ class EtlTool
             return $this;
         }
 
-        if (is_callable($extractor) || $extractor === null) {
-            $this->extractor = $extractor;
+        $this->extractor = $extractor;
 
-            return $this;
-        }
 
-        throw new InvalidArgumentException(sprintf(
-            'The extractor could be callable, null or instance of %s, but got %s',
-            ExtractorInterface::class,
-            is_object($extractor) ? get_class($extractor) : gettype($extractor)
-        ));
+        return $this;
     }
 
     /**
@@ -152,7 +145,7 @@ class EtlTool
      * @param TransformerInterface|callable|null $transformer
      * @return $this
      */
-    public function transformer($transformer): self
+    public function transformer(TransformerInterface|callable|null $transformer): self
     {
         if ($transformer instanceof TransformerInterface) {
             $this->transformer = [$transformer, 'transform'];
@@ -160,17 +153,9 @@ class EtlTool
             return $this;
         }
 
-        if (is_callable($transformer) || $transformer === null) {
-            $this->transformer = $transformer;
+        $this->transformer = $transformer;
 
-            return $this;
-        }
-
-        throw new InvalidArgumentException(sprintf(
-            'The transformer could be  callable, null or instance of %s, but got %s',
-            TransformerInterface::class,
-            is_object($transformer) ? get_class($transformer) : gettype($transformer)
-        ));
+        return $this;
     }
 
     /**
@@ -178,7 +163,7 @@ class EtlTool
      * @param LoaderInterface|callable $loader
      * @return $this
      */
-    public function loader($loader): self
+    public function loader(LoaderInterface|callable $loader): self
     {
         if ($loader instanceof LoaderInterface) {
             $this->loader = [$loader, 'load'];
@@ -189,17 +174,9 @@ class EtlTool
             return $this;
         }
 
-        if (is_callable($loader)) {
-            $this->loader = $loader;
+        $this->loader = $loader;
 
-            return $this;
-        }
-
-        throw new InvalidArgumentException(sprintf(
-            'The loader could be  callable or instance of %s, but got %s',
-            LoaderInterface::class,
-            is_object($loader) ? get_class($loader) : gettype($loader)
-        ));
+        return $this;
     }
 
     /**
@@ -220,8 +197,10 @@ class EtlTool
      * @param int $priority the listener execution priority
      * @return $this
      */
-    public function onStart($listener, int $priority = DispatcherInterface::PRIORITY_DEFAULT): self
-    {
+    public function onStart(
+        ListenerInterface|callable $listener,
+        int $priority = DispatcherInterface::PRIORITY_DEFAULT
+    ): self {
         $this->dispatcher->addListener(BaseEvent::START, $listener, $priority);
 
         return $this;
@@ -234,8 +213,10 @@ class EtlTool
      * @param int $priority the listener execution priority
      * @return $this
      */
-    public function onExtract($listener, int $priority = DispatcherInterface::PRIORITY_DEFAULT): self
-    {
+    public function onExtract(
+        ListenerInterface|callable $listener,
+        int $priority = DispatcherInterface::PRIORITY_DEFAULT
+    ): self {
         $this->dispatcher->addListener(BaseEvent::EXTRACT, $listener, $priority);
 
         return $this;
@@ -248,8 +229,10 @@ class EtlTool
      * @param int $priority the listener execution priority
      * @return $this
      */
-    public function onExtractException($listener, int $priority = DispatcherInterface::PRIORITY_DEFAULT): self
-    {
+    public function onExtractException(
+        ListenerInterface|callable $listener,
+        int $priority = DispatcherInterface::PRIORITY_DEFAULT
+    ): self {
         $this->dispatcher->addListener(BaseEvent::EXTRACT_EXCEPTION, $listener, $priority);
 
         return $this;
@@ -262,8 +245,10 @@ class EtlTool
      * @param int $priority the listener execution priority
      * @return $this
      */
-    public function onTransform($listener, int $priority = DispatcherInterface::PRIORITY_DEFAULT): self
-    {
+    public function onTransform(
+        ListenerInterface|callable $listener,
+        int $priority = DispatcherInterface::PRIORITY_DEFAULT
+    ): self {
         $this->dispatcher->addListener(BaseEvent::TRANSFORM, $listener, $priority);
 
         return $this;
@@ -276,8 +261,10 @@ class EtlTool
      * @param int $priority the listener execution priority
      * @return $this
      */
-    public function onTransformException($listener, int $priority = DispatcherInterface::PRIORITY_DEFAULT): self
-    {
+    public function onTransformException(
+        ListenerInterface|callable $listener,
+        int $priority = DispatcherInterface::PRIORITY_DEFAULT
+    ): self {
         $this->dispatcher->addListener(BaseEvent::TRANSFORM_EXCEPTION, $listener, $priority);
 
         return $this;
@@ -290,8 +277,10 @@ class EtlTool
      * @param int $priority the listener execution priority
      * @return $this
      */
-    public function onLoaderInit($listener, int $priority = DispatcherInterface::PRIORITY_DEFAULT): self
-    {
+    public function onLoaderInit(
+        ListenerInterface|callable $listener,
+        int $priority = DispatcherInterface::PRIORITY_DEFAULT
+    ): self {
         $this->dispatcher->addListener(BaseEvent::LOADER_INIT, $listener, $priority);
 
         return $this;
@@ -304,8 +293,10 @@ class EtlTool
      * @param int $priority the listener execution priority
      * @return $this
      */
-    public function onLoad($listener, int $priority = DispatcherInterface::PRIORITY_DEFAULT): self
-    {
+    public function onLoad(
+        ListenerInterface|callable $listener,
+        int $priority = DispatcherInterface::PRIORITY_DEFAULT
+    ): self {
         $this->dispatcher->addListener(BaseEvent::LOAD, $listener, $priority);
 
         return $this;
@@ -318,8 +309,10 @@ class EtlTool
      * @param int $priority the listener execution priority
      * @return $this
      */
-    public function onLoadException($listener, int $priority = DispatcherInterface::PRIORITY_DEFAULT): self
-    {
+    public function onLoadException(
+        ListenerInterface|callable $listener,
+        int $priority = DispatcherInterface::PRIORITY_DEFAULT
+    ): self {
         $this->dispatcher->addListener(BaseEvent::LOAD_EXCEPTION, $listener, $priority);
 
         return $this;
@@ -332,8 +325,10 @@ class EtlTool
      * @param int $priority the listener execution priority
      * @return $this
      */
-    public function onFlush($listener, int $priority = DispatcherInterface::PRIORITY_DEFAULT): self
-    {
+    public function onFlush(
+        ListenerInterface|callable $listener,
+        int $priority = DispatcherInterface::PRIORITY_DEFAULT
+    ): self {
         $this->dispatcher->addListener(BaseEvent::FLUSH, $listener, $priority);
 
         return $this;
@@ -346,8 +341,10 @@ class EtlTool
      * @param int $priority the listener execution priority
      * @return $this
      */
-    public function onSkip($listener, int $priority = DispatcherInterface::PRIORITY_DEFAULT): self
-    {
+    public function onSkip(
+        ListenerInterface|callable $listener,
+        int $priority = DispatcherInterface::PRIORITY_DEFAULT
+    ): self {
         $this->dispatcher->addListener(BaseEvent::SKIP, $listener, $priority);
 
         return $this;
@@ -360,8 +357,10 @@ class EtlTool
      * @param int $priority the listener execution priority
      * @return $this
      */
-    public function onStop($listener, int $priority = DispatcherInterface::PRIORITY_DEFAULT): self
-    {
+    public function onStop(
+        ListenerInterface|callable $listener,
+        int $priority = DispatcherInterface::PRIORITY_DEFAULT
+    ): self {
         $this->dispatcher->addListener(BaseEvent::STOP, $listener, $priority);
 
         return $this;
@@ -374,8 +373,10 @@ class EtlTool
      * @param int $priority the listener execution priority
      * @return $this
      */
-    public function onRollback($listener, int $priority = DispatcherInterface::PRIORITY_DEFAULT): self
-    {
+    public function onRollback(
+        ListenerInterface|callable $listener,
+        int $priority = DispatcherInterface::PRIORITY_DEFAULT
+    ): self {
         $this->dispatcher->addListener(BaseEvent::ROLLBACK, $listener, $priority);
 
         return $this;
@@ -388,8 +389,10 @@ class EtlTool
      * @param int $priority the listener execution priority
      * @return $this
      */
-    public function onEnd($listener, int $priority = DispatcherInterface::PRIORITY_DEFAULT): self
-    {
+    public function onEnd(
+        ListenerInterface|callable $listener,
+        int $priority = DispatcherInterface::PRIORITY_DEFAULT
+    ): self {
         $this->dispatcher->addListener(BaseEvent::END, $listener, $priority);
 
         return $this;

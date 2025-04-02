@@ -188,11 +188,11 @@ class Etl
 
     /**
      * Run the ETL on the given input.
-     * @param mixed|null $data
+     * @param mixed $data
      * @param array<string, mixed> $options additional options
      * @return void
      */
-    public function process($data = null, array $options = []): void
+    public function process(mixed $data = null, array $options = []): void
     {
         if (count($options) > 0) {
             $this->options = $options;
@@ -274,7 +274,7 @@ class Etl
      * @param int|string $key
      * @return void
      */
-    protected function skip($item, $key): void
+    protected function skip(mixed $item, int|string $key): void
     {
         $this->isSkip = false;
         $this->dispatcher->dispatch(new ItemEvent(BaseEvent::SKIP, $item, $key, $this));
@@ -285,9 +285,14 @@ class Etl
      * @param int|string $key
      * @return void
      */
-    protected function stop($item, $key): void
+    protected function stop(mixed $item, int|string $key): void
     {
-        $this->dispatcher->dispatch(new ItemEvent(BaseEvent::STOP, $item, $key, $this));
+        $this->dispatcher->dispatch(new ItemEvent(
+            BaseEvent::STOP,
+            $item,
+            $key,
+            $this
+        ));
     }
 
     /**
@@ -317,9 +322,11 @@ class Etl
      * @param mixed $data
      * @return iterable<int|string, mixed>
      */
-    protected function extract($data): iterable
+    protected function extract(mixed $data): iterable
     {
-        $items = $this->extract === null ? $data : ($this->extract)($data, $this, $this->options);
+        $items = $this->extract === null
+                ? $data
+                : ($this->extract)($data, $this, $this->options);
         if ($items === null) {
             $items = new EmptyIterator();
         }
@@ -332,7 +339,12 @@ class Etl
             foreach ($items as $key => $item) {
                 try {
                     $this->isSkip = false;
-                    $this->dispatcher->dispatch(new ItemEvent(BaseEvent::EXTRACT, $item, $key, $this));
+                    $this->dispatcher->dispatch(new ItemEvent(
+                        BaseEvent::EXTRACT,
+                        $item,
+                        $key,
+                        $this
+                    ));
                     yield $key => $item;
                 } catch (Exception $e) {
                     continue;
@@ -341,7 +353,13 @@ class Etl
         } catch (Throwable $e) {
             /** @var ItemExceptionEvent $event */
             $event = $this->dispatcher->dispatch(
-                new ItemExceptionEvent(BaseEvent::EXTRACT_EXCEPTION, $item ?? null, $key ?? null, $this, $e)
+                new ItemExceptionEvent(
+                    BaseEvent::EXTRACT_EXCEPTION,
+                    $item ?? null,
+                    $key ?? null,
+                    $this,
+                    $e
+                )
             );
 
             if ($event->shouldThrowException()) {
@@ -356,7 +374,7 @@ class Etl
      * @param int|string $key
      * @return callable
      */
-    protected function transform($item, $key): callable
+    protected function transform(mixed $item, int|string $key): callable
     {
         $tranformed = ($this->transform)($item, $key, $this, $this->options);
         if (!$tranformed instanceof Generator) {
@@ -393,7 +411,7 @@ class Etl
      * @param int|string $key
      * @return void
      */
-    protected function initLoader($item, $key): void
+    protected function initLoader(mixed $item, int|string $key): void
     {
         $this->dispatcher->dispatch(new ItemEvent(BaseEvent::LOADER_INIT, $item, $key, $this));
         if ($this->init === null) {
@@ -415,19 +433,30 @@ class Etl
      */
     protected function load(
         iterable $data,
-        $item,
-        $key,
+        mixed $item,
+        int|string $key,
         bool $flush,
         int &$flushCounter,
         int &$totalCounter
     ): void {
         try {
             ($this->load)($data, $key, $this);
-            $this->dispatcher->dispatch(new ItemEvent(BaseEvent::LOAD, $item, $key, $this));
+            $this->dispatcher->dispatch(new ItemEvent(
+                BaseEvent::LOAD,
+                $item,
+                $key,
+                $this
+            ));
         } catch (Throwable $e) {
             /** @var ItemExceptionEvent $event */
             $event = $this->dispatcher->dispatch(
-                new ItemExceptionEvent(BaseEvent::LOAD_EXCEPTION, $item ?? null, $key, $this, $e)
+                new ItemExceptionEvent(
+                    BaseEvent::LOAD_EXCEPTION,
+                    $item ?? null,
+                    $key,
+                    $this,
+                    $e
+                )
             );
 
             if ($event->shouldThrowException()) {
@@ -456,7 +485,11 @@ class Etl
             return;
         }
         ($this->flush)($partial);
-        $this->dispatcher->dispatch(new FlushEvent($this, $flushCounter, $partial));
+        $this->dispatcher->dispatch(new FlushEvent(
+            $this,
+            $flushCounter,
+            $partial
+        ));
         $flushCounter = 0;
         $this->isFlush = false;
     }

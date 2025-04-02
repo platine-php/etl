@@ -53,5 +53,10 @@ interface TransformerInterface
      * @param array<string, mixed> $options additional options
      * @return Generator yield values to load
      */
-    public function transform($value, $key, Etl $etl, array $options = []): Generator;
+    public function transform(
+        mixed $value,
+        int|string $key,
+        Etl $etl,
+        array $options = []
+    ): Generator;
 }

@@ -44,15 +44,15 @@ class ItemExceptionEvent extends BaseEvent
 {
     /**
      * The item
-     * @var mixed|null
+     * @var mixed
      */
-    protected $item;
+    protected mixed $item;
 
     /**
      * The key
      * @var int|string|null
      */
-    protected $key;
+    protected int|string|null $key;
 
     /**
      * The exception that is raised
@@ -71,13 +71,18 @@ class ItemExceptionEvent extends BaseEvent
     /**
      * Create new instance
      * @param string $name
-     * @param mixed|null $item
+     * @param mixed $item
      * @param int|string|null $key
      * @param Etl $etl
      * @param Throwable $exception
      */
-    public function __construct(string $name, $item, $key, Etl $etl, Throwable $exception)
-    {
+    public function __construct(
+        string $name,
+        mixed $item,
+        int|string|null $key,
+        Etl $etl,
+        Throwable $exception
+    ) {
         parent::__construct($name, $etl);
         $this->item = $item;
         $this->key = $key;
@@ -88,7 +93,7 @@ class ItemExceptionEvent extends BaseEvent
      * Return the item
      * @return mixed
      */
-    public function getItem()
+    public function getItem(): mixed
     {
         return $this->item;
     }
@@ -97,7 +102,7 @@ class ItemExceptionEvent extends BaseEvent
      * Return the key
      * @return int|string|null
      */
-    public function getKey()
+    public function getKey(): int|string|null
     {
         return $this->key;
     }

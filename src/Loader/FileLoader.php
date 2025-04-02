@@ -60,7 +60,7 @@ class FileLoader implements LoaderInterface
      * @param SplFileObject|string $file
      * @param string $eol
      */
-    public function __construct($file, string $eol = PHP_EOL)
+    public function __construct(SplFileObject|string $file, string $eol = PHP_EOL)
     {
         if (is_string($file)) {
             $file = new SplFileObject($file, 'w');
@@ -83,7 +83,7 @@ class FileLoader implements LoaderInterface
     /**
      * {@inheritodc}
      */
-    public function load(Generator $items, $key, Etl $etl): void
+    public function load(Generator $items, int|string $key, Etl $etl): void
     {
         foreach ($items as $value) {
             $this->file->fwrite($value . $this->eol);

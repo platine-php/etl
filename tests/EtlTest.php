@@ -56,6 +56,7 @@ class EtlTest extends PlatineTestCase
         $this->assertEquals(['a','b'], $target->current());
     }
 
+
     public function testProcessUsingOptions(): void
     {
         $target = [];

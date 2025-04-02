@@ -83,7 +83,7 @@ class CsvFileLoader implements LoaderInterface
      * @param string $escapeString
      */
     public function __construct(
-        $file,
+        SplFileObject|string $file,
         array $keys = [],
         string $delimiter = ',',
         string $enclosure = '"',
@@ -122,6 +122,10 @@ class CsvFileLoader implements LoaderInterface
             $this->keys = $options['keys'];
         }
 
+        // Adds UTF-8 BOM for Unicode compatibility
+        $utf8Bom = "\xEF\xBB\xBF"; // NOTE use of double quote is important
+        $this->file->fwrite($utf8Bom);
+
         if (count($this->keys) > 0) {
             $this->file->fputcsv(
                 $this->keys,
@@ -136,7 +140,7 @@ class CsvFileLoader implements LoaderInterface
     /**
      * {@inheritodc}
      */
-    public function load(Generator $items, $key, Etl $etl): void
+    public function load(Generator $items, int|string $key, Etl $etl): void
     {
         foreach ($items as $value) {
             $this->file->fputcsv(

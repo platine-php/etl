@@ -82,9 +82,9 @@ class TextLineIterator implements StringIteratorInterface, IteratorAggregate
 
     /**
      * Uses a regex to split lines.
-     * @return Generator|string[]
+     * @return Traversable<int|string, mixed>
      */
-    protected function pregSplitIterator()
+    protected function pregSplitIterator(): Traversable
     {
         $lines = (array) preg_split("/((\r?\n)|(\r\n?))/", $this->content);
         foreach ($lines as $line) {
@@ -94,9 +94,9 @@ class TextLineIterator implements StringIteratorInterface, IteratorAggregate
 
     /**
      * Uses "strtok" to split lines. Provides better performance, but skips empty lines.
-     * @return Generator|string[]
+     * @return Traversable<int|string, mixed>
      */
-    protected function strtokIterator()
+    protected function strtokIterator(): Traversable
     {
         $tok = strtok($this->content, "\r\n");
         while ($tok !== false) {

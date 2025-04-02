@@ -77,7 +77,7 @@ class JsonFileLoader implements LoaderInterface
      * @param int $depth
      */
     public function __construct(
-        $file,
+        SplFileObject|string $file,
         int $options = 0,
         int $depth = 512
     ) {
@@ -108,7 +108,7 @@ class JsonFileLoader implements LoaderInterface
     /**
      * {@inheritodc}
      */
-    public function load(Generator $items, $key, Etl $etl): void
+    public function load(Generator $items, int|string $key, Etl $etl): void
     {
         foreach ($items as $k => $v) {
             $this->data[$k] = $v;
@@ -124,7 +124,13 @@ class JsonFileLoader implements LoaderInterface
             return;
         }
 
-        if ($this->file->fwrite(Json::encode($this->data, $this->options, $this->depth)) === 0) {
+        if (
+            $this->file->fwrite(Json::encode(
+                $this->data,
+                $this->options,
+                $this->depth
+            )) === 0
+        ) {
             throw new RuntimeException(sprintf(
                 'Unable to write json data into %s',
                 $this->file->getPathname()

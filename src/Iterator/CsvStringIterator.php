@@ -115,7 +115,7 @@ class CsvStringIterator implements IteratorAggregate, CsvIteratorInterface
         string $enclosure = '"',
         string $escapeString = '\\'
     ): self {
-        return new static(
+        return new self(
             new TextLineIterator($text, true),
             $delimiter,
             $enclosure,

@@ -63,8 +63,12 @@ class CallableTransformer implements TransformerInterface
     /**
      * {@inheritodc}
      */
-    public function transform($value, $key, Etl $etl, array $options = []): Generator
-    {
+    public function transform(
+        mixed $value,
+        int|string $key,
+        Etl $etl,
+        array $options = []
+    ): Generator {
         yield $key => ($this->callable)($value);
     }
 }

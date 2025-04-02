@@ -70,7 +70,7 @@ class JsonExtractor implements ExtractorInterface
     /**
      * {@inheritodc}
      */
-    public function extract($input, Etl $etl, array $options = []): iterable
+    public function extract(mixed $input, Etl $etl, array $options = []): iterable
     {
         $this->setOptions($options);
 
@@ -122,7 +122,7 @@ class JsonExtractor implements ExtractorInterface
      * @param SplFileObject|string $file
      * @return iterable<int|string, mixed>
      */
-    protected function extractFromFile($file): iterable
+    protected function extractFromFile(SplFileObject|string $file): iterable
     {
         if ($file instanceof SplFileObject) {
             $file = $file->getPathname();
@@ -140,10 +140,10 @@ class JsonExtractor implements ExtractorInterface
 
     /**
      * Extract source data by detect the type
-     * @param mixed $data
+     * @param array<mixed>|string $data
      * @return iterable<int|string, mixed>
      */
-    protected function extractAuto($data): iterable
+    protected function extractAuto(array|string $data): iterable
     {
         if (is_array($data)) {
             return $this->extractFromArray($data);
@@ -151,6 +151,7 @@ class JsonExtractor implements ExtractorInterface
 
         try {
             $json = Json::decode($data, true);
+
             return $this->extractFromArray($json);
         } catch (Exception $e) {
             if (strlen($data) < 3000 && file_exists($data)) {
@@ -166,7 +167,7 @@ class JsonExtractor implements ExtractorInterface
      * @param array<string, mixed> $options
      * @return $this
      */
-    protected function setOptions(array $options)
+    protected function setOptions(array $options): self
     {
         if (isset($options['type']) && is_int($options['type'])) {
             $this->type = $options['type'];

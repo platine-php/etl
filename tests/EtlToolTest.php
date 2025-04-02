@@ -45,9 +45,6 @@ class EtlToolTest extends PlatineTestCase
 
         $o->extractor(fn() => true);
         $this->assertIsCallable($this->getPropertyValue(EtlTool::class, $o, 'extractor'));
-
-        $this->expectException(InvalidArgumentException::class);
-        $o->extractor(true);
     }
 
     public function testTransformer(): void
@@ -59,9 +56,6 @@ class EtlToolTest extends PlatineTestCase
 
         $o->transformer(fn() => true);
         $this->assertIsCallable($this->getPropertyValue(EtlTool::class, $o, 'transformer'));
-
-        $this->expectException(InvalidArgumentException::class);
-        $o->transformer(true);
     }
 
     public function testLoader(): void
@@ -73,9 +67,6 @@ class EtlToolTest extends PlatineTestCase
 
         $o->loader(fn() => true);
         $this->assertIsCallable($this->getPropertyValue(EtlTool::class, $o, 'loader'));
-
-        $this->expectException(InvalidArgumentException::class);
-        $o->loader(true);
     }
 
     public function testCreateInvalidLoader(): void

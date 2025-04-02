@@ -108,14 +108,14 @@ class CsvFileIterator extends FilterIterator implements Countable, CsvIteratorIn
             return false;
         }
 
-        return !empty(
+        return count(
             array_filter(
                 $current,
                 function ($cell) {
                     return $cell !== null;
                 }
             )
-        );
+        ) > 0;
     }
 
 

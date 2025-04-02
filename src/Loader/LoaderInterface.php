@@ -59,7 +59,7 @@ interface LoaderInterface
      * @param Etl $etl
      * @return void
      */
-    public function load(Generator $items, $key, Etl $etl): void;
+    public function load(Generator $items, int|string $key, Etl $etl): void;
 
     /**
      * Flush elements (if supported).

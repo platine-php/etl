@@ -68,7 +68,8 @@ class CsvFileLoaderTest extends PlatineTestCase
         ]);
         $o->load($generator->getIterator(), 'a', $etl);
 
-        $this->assertEquals("a;b\n1;2\n", $file->getContent());
+        $utf8Bom = "\xEF\xBB\xBF";
+        $this->assertEquals("${utf8Bom}a;b\n1;2\n", $file->getContent());
     }
 
 

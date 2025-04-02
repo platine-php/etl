@@ -45,13 +45,13 @@ class ItemEvent extends BaseEvent
      * The item
      * @var mixed
      */
-    protected $item;
+    protected mixed $item;
 
     /**
      * The key
      * @var int|string
      */
-    protected $key;
+    protected int|string $key;
 
     /**
      * Create new instance
@@ -60,8 +60,12 @@ class ItemEvent extends BaseEvent
      * @param int|string $key
      * @param Etl $etl
      */
-    public function __construct(string $name, $item, $key, Etl $etl)
-    {
+    public function __construct(
+        string $name,
+        mixed $item,
+        int|string $key,
+        Etl $etl
+    ) {
         parent::__construct($name, $etl);
         $this->item = $item;
         $this->key = $key;
@@ -71,7 +75,7 @@ class ItemEvent extends BaseEvent
      * Return the item
      * @return mixed
      */
-    public function getItem()
+    public function getItem(): mixed
     {
         return $this->item;
     }
@@ -80,7 +84,7 @@ class ItemEvent extends BaseEvent
      * Return the key
      * @return int|string
      */
-    public function getKey()
+    public function getKey(): int|string
     {
         return $this->key;
     }

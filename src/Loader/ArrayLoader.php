@@ -79,7 +79,7 @@ class ArrayLoader implements LoaderInterface
     /**
      * {@inheritodc}
      */
-    public function load(Generator $items, $key, Etl $etl): void
+    public function load(Generator $items, int|string $key, Etl $etl): void
     {
         foreach ($items as $value) {
             if ($this->preserveKeys) {

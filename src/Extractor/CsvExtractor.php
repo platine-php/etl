@@ -105,7 +105,7 @@ class CsvExtractor implements ExtractorInterface
     /**
      * {@inheritodc}
      */
-    public function extract($input, Etl $etl, array $options = []): iterable
+    public function extract(mixed $input, Etl $etl, array $options = []): iterable
     {
         $this->setOptions($options);
 
@@ -154,7 +154,7 @@ class CsvExtractor implements ExtractorInterface
      * @param SplFileObject|string $file
      * @return iterable<int|string, mixed>
      */
-    protected function extractFromFile($file): iterable
+    protected function extractFromFile(SplFileObject|string $file): iterable
     {
         if ($file instanceof SplFileObject) {
             return new CsvFileIterator(
@@ -192,7 +192,7 @@ class CsvExtractor implements ExtractorInterface
      * @param array<string, mixed> $options
      * @return $this
      */
-    protected function setOptions(array $options)
+    protected function setOptions(array $options): self
     {
         if (isset($options['delimiter'])) {
             $this->delimiter = $options['delimiter'];
