@@ -21,7 +21,7 @@
     "require": {
         "php": "^8",
         "platine-php/event-dispatcher": "^1.0@dev",
-        "platine-php/stdlib": "^1.0@dev"
+        "platine-php/stdlib": "^2.0@dev"
     },
 	
     "require-dev": {
